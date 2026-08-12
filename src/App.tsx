@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { CalendarDays, CheckSquare, Clapperboard, LogOut, Package, Plus, Users } from 'lucide-react'
+import KppImport from './components/KppImport'
 import { supabase } from './lib/supabase'
 
 type Project = { id: string; name: string; description: string; total_budget: number; currency: string }
@@ -9,6 +10,7 @@ type Task = { id: string; title: string; status: string; priority: string; due_a
 
 const tabs = [
   ['overview', 'Обзор'],
+  ['kpp', 'КПП'],
   ['scenes', 'Сцены'],
   ['props', 'Реквизит'],
   ['tasks', 'Задания'],
@@ -182,7 +184,7 @@ export default function App() {
         </nav>
 
         {message && <div className="notice wide">{message}</div>}
-        {!projectId ? <Empty icon={<Clapperboard/>} title="Создайте первый проект" text="После этого можно добавлять сцены, реквизит и задания." /> : null}
+        {!projectId ? <Empty icon={<Clapperboard/>} title="Создайте первый проект" text="После этого можно загрузить КПП, добавить реквизит и задания." /> : null}
 
         {projectId && tab === 'overview' && (
           <section className="content-grid">
@@ -200,6 +202,8 @@ export default function App() {
             </div>
           </section>
         )}
+
+        {projectId && tab === 'kpp' && <KppImport projectId={projectId} onImported={() => loadProjectData(projectId)} />}
 
         {projectId && tab === 'scenes' && (
           <section className="panel">
