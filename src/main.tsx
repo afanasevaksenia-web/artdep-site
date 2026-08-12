@@ -5,6 +5,7 @@ import './index.css'
 import './components/KppImport.css'
 import './components/KppBoard.css'
 import './components/SceneWorkPanel.css'
+import './components/ContinuityBoard.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
