@@ -51,7 +51,7 @@ export default function ContinuityBoard({ projectId }: Props) {
 
   const activeGroup = groups.find((g) => g.id === activeGroupId) ?? null
 
-  async function loadBase() {
+  async function loadBase(preferredGroupId?: string | null) {
     const [groupsResult, scenesResult, daysResult, propsResult] = await Promise.all([
       supabase.from('continuity_groups').select('id,title,description').eq('project_id', projectId).order('created_at'),
       supabase.from('scenes').select('id,episode,scene_number,set_name,location,shoot_day_id,script_order').eq('project_id', projectId).order('script_order'),
@@ -65,7 +65,8 @@ export default function ContinuityBoard({ projectId }: Props) {
     setScenes((scenesResult.data ?? []) as Scene[])
     setShootDays((daysResult.data ?? []) as ShootDay[])
     setProps((propsResult.data ?? []) as PropItem[])
-    if (!activeGroupId && groupRows[0]) setActiveGroupId(groupRows[0].id)
+    const preferredExists = preferredGroupId && groupRows.some((group) => group.id === preferredGroupId)
+    setActiveGroupId(preferredExists ? preferredGroupId : groupRows[0]?.id ?? null)
   }
 
   async function loadGroup(groupId: string) {
@@ -91,7 +92,15 @@ export default function ContinuityBoard({ projectId }: Props) {
     setMedia(withUrls)
   }
 
-  useEffect(() => { loadBase() }, [projectId])
+  useEffect(() => {
+    setActiveGroupId(null)
+    setGroupScenes([])
+    setItems([])
+    setStates([])
+    setMedia([])
+    setMessage('')
+    loadBase(null)
+  }, [projectId])
 
   useEffect(() => {
     if (!activeGroupId) {
@@ -101,7 +110,7 @@ export default function ContinuityBoard({ projectId }: Props) {
     loadGroup(activeGroupId)
     const channel = supabase
       .channel(`continuity-${activeGroupId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'continuity_groups', filter: `project_id=eq.${projectId}` }, loadBase)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'continuity_groups', filter: `project_id=eq.${projectId}` }, () => loadBase(activeGroupId))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'continuity_group_scenes', filter: `group_id=eq.${activeGroupId}` }, () => loadGroup(activeGroupId))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'continuity_items', filter: `project_id=eq.${projectId}` }, () => loadGroup(activeGroupId))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'continuity_item_states', filter: `project_id=eq.${projectId}` }, () => loadGroup(activeGroupId))
