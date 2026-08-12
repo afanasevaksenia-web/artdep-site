@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { Camera, Check, Circle, Link2, PackagePlus, Plus, Trash2, UploadCloud } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -44,11 +44,11 @@ type Props = {
 }
 
 function isReady(value: string) {
-  return ['ready', 'готов', 'готово', 'done'].includes(String(value || '').trim().toLowerCase())
+  return String(value || '').trim().toLowerCase() === 'ready'
 }
 
 function isTaskDone(value: string) {
-  return ['done', 'completed', 'готово', 'выполнено'].includes(String(value || '').trim().toLowerCase())
+  return String(value || '').trim().toLowerCase() === 'done'
 }
 
 function safeFileName(name: string) {
@@ -73,7 +73,7 @@ export default function SceneWorkPanel({ projectId, sceneId }: Props) {
       supabase.from('props').select('id,name,category,readiness,quantity,storage_location,acquisition_type').eq('project_id', projectId).order('name'),
       supabase.from('scene_props').select('id,prop_id,quantity,continuity_details,position_notes,is_hero').eq('scene_id', sceneId).order('created_at'),
       supabase.from('tasks').select('id,title,status,priority,due_at').eq('project_id', projectId).eq('scene_id', sceneId).order('created_at', { ascending: false }),
-      supabase.from('media').select('id,storage_path,file_name,caption,created_at').eq('project_id', projectId).eq('scene_id', sceneId).order('created_at', { ascending: false }),
+      supabase.from('media').select('id,storage_path,file_name,caption,created_at').eq('project_id', projectId).eq('scene_id', sceneId).eq('kind', 'photo').order('created_at', { ascending: false }),
     ])
 
     const firstError = propsResult.error || linksResult.error || tasksResult.error || mediaResult.error
@@ -136,7 +136,7 @@ export default function SceneWorkPanel({ projectId, sceneId }: Props) {
     setMessage('')
     const created = await supabase
       .from('props')
-      .insert({ project_id: projectId, name: newPropName.trim(), category: 'Реквизит', readiness: 'not_ready' })
+      .insert({ project_id: projectId, name: newPropName.trim(), category: 'Реквизит', readiness: 'needed' })
       .select('id')
       .single()
     if (created.error) {
@@ -151,7 +151,7 @@ export default function SceneWorkPanel({ projectId, sceneId }: Props) {
   }
 
   async function togglePropReady(prop: PropItem) {
-    const next = isReady(prop.readiness) ? 'not_ready' : 'ready'
+    const next = isReady(prop.readiness) ? 'needed' : 'ready'
     const result = await supabase.from('props').update({ readiness: next }).eq('id', prop.id)
     if (result.error) setMessage(result.error.message)
   }
@@ -227,12 +227,16 @@ export default function SceneWorkPanel({ projectId, sceneId }: Props) {
       storage_path: path,
       file_name: file.name,
       mime_type: file.type,
-      kind: 'continuity',
+      kind: 'photo',
       caption: photoCaption.trim(),
       uploaded_by: userId,
     })
-    if (inserted.error) setMessage(inserted.error.message)
-    else setPhotoCaption('')
+    if (inserted.error) {
+      await supabase.storage.from('project-files').remove([path])
+      setMessage(inserted.error.message)
+    } else {
+      setPhotoCaption('')
+    }
     setBusy(false)
   }
 
@@ -244,7 +248,7 @@ export default function SceneWorkPanel({ projectId, sceneId }: Props) {
           <strong>{linked.length ? `${readiness}%` : 'Нет позиций'}</strong>
           <small>{linked.length ? `${readyCount} из ${linked.length} готовы` : 'Свяжите реквизит со сценой'}</small>
         </div>
-        <div className="readiness-ring" style={{ '--progress': `${readiness * 3.6}deg` } as React.CSSProperties}><span>{readiness}%</span></div>
+        <div className="readiness-ring" style={{ '--progress': `${readiness * 3.6}deg` } as CSSProperties}><span>{readiness}%</span></div>
       </section>
 
       <section className="scene-work-section">
