@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CalendarDays, ChevronRight, Clapperboard, MapPin, RefreshCw, Search, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import SceneWorkPanel from './SceneWorkPanel'
 
 type ShootDay = {
   id: string
@@ -41,7 +42,7 @@ type Props = { projectId: string }
 const detailRows: { key: keyof Scene; label: string }[] = [
   { key: 'cast_text', label: 'Актёры / персонажи' },
   { key: 'extras_text', label: 'Массовка' },
-  { key: 'props_text', label: 'Реквизит' },
+  { key: 'props_text', label: 'Реквизит из КПП' },
   { key: 'personal_props_text', label: 'Личный реквизит' },
   { key: 'transport_text', label: 'Транспорт' },
   { key: 'animals_text', label: 'Животные' },
@@ -184,6 +185,7 @@ export default function KppBoard({ projectId }: Props) {
                   })}
                   <div className="scene-detail"><span>Стыки / примечания КПП</span><strong>{selected.kpp_notes || '—'}</strong></div>
                 </div>
+                <SceneWorkPanel projectId={projectId} sceneId={selected.id}/>
               </>
             ) : <div className="drawer-placeholder"><ChevronRight size={28}/><strong>Выберите сцену</strong><span>Карточка откроется здесь без перехода на другую страницу.</span></div>}
           </aside>
