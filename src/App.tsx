@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { CalendarDays, CheckSquare, Clapperboard, LogOut, Package, Plus, Users } from 'lucide-react'
 import KppImport from './components/KppImport'
+import ContinuityBoard from './components/ContinuityBoard'
 import { supabase } from './lib/supabase'
 
 type Project = { id: string; name: string; description: string; total_budget: number; currency: string }
@@ -11,6 +12,7 @@ type Task = { id: string; title: string; status: string; priority: string; due_a
 const tabs = [
   ['overview', 'Обзор'],
   ['kpp', 'КПП'],
+  ['continuity', 'Стыки'],
   ['scenes', 'Сцены'],
   ['props', 'Реквизит'],
   ['tasks', 'Задания'],
@@ -204,6 +206,7 @@ export default function App() {
         )}
 
         {projectId && tab === 'kpp' && <KppImport projectId={projectId} onImported={() => loadProjectData(projectId)} />}
+        {projectId && tab === 'continuity' && <ContinuityBoard projectId={projectId} />}
 
         {projectId && tab === 'scenes' && (
           <section className="panel">
