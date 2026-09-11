@@ -126,6 +126,11 @@ button:disabled {
   text-decoration: underline;
 }
 
+#authToggle,
+#fullNameInput {
+  display: none !important;
+}
+
 .error {
   color: #dc2626;
   margin-top: 12px;
