@@ -3,90 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ArtDep — команда</title>
+  <title>ArtDep — анализ сценария</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
+  <div class="container">
     <h1>🎬 ArtDep</h1>
-    <div id="userBar" hidden>
-      <span id="userName"></span>
-      <button id="logoutBtn">Выйти</button>
-    </div>
-  </header>
+    <p>Вставь сценарий ниже, и я покажу список реквизита, декораций, животных и транспорта.</p>
 
-  <main>
-    <section id="authSection">
-      <div class="auth-card">
-        <h2 id="authTitle">Вход</h2>
-        <form id="authForm">
-          <input type="text" id="fullNameInput" placeholder="Имя" hidden />
-          <input type="email" id="emailInput" placeholder="Email" required />
-          <input type="password" id="passwordInput" placeholder="Пароль" minlength="6" required />
-          <button type="submit" id="authSubmit">Войти</button>
-        </form>
-        <p id="authError" class="error" hidden></p>
-        <p id="authInfo" class="info" hidden></p>
-        <button type="button" id="authToggle" class="link-btn">Нет аккаунта? Зарегистрироваться</button>
-      </div>
-    </section>
+    <textarea id="script" placeholder="Вставь сюда текст сценария..."></textarea>
+    <button id="analyze">🔍 Анализировать</button>
 
-    <section id="appSection" hidden>
-      <nav id="tabs">
-        <button data-tab="feed" class="tab active">Лента</button>
-        <button data-tab="calendar" class="tab">Календарь</button>
-        <button data-tab="tasks" class="tab">Задачи</button>
-        <button data-tab="files" class="tab">Файлы</button>
-      </nav>
-
-      <section id="feed" class="tab-panel active">
-        <form id="postForm" class="card-form">
-          <textarea id="postContent" placeholder="Что нового у группы?" required></textarea>
-          <button type="submit">Опубликовать</button>
-        </form>
-        <ul id="postList" class="item-list"></ul>
-      </section>
-
-      <section id="calendar" class="tab-panel">
-        <form id="shiftForm" class="card-form">
-          <input type="text" id="shiftTitle" placeholder="Название смены" required />
-          <input type="text" id="shiftLocation" placeholder="Локация" />
-          <label>Начало
-            <input type="datetime-local" id="shiftStart" required />
-          </label>
-          <label>Конец
-            <input type="datetime-local" id="shiftEnd" />
-          </label>
-          <textarea id="shiftNotes" placeholder="Заметки"></textarea>
-          <button type="submit">Добавить смену</button>
-        </form>
-        <ul id="shiftList" class="item-list"></ul>
-      </section>
-
-      <section id="tasks" class="tab-panel">
-        <form id="taskForm" class="card-form">
-          <input type="text" id="taskTitle" placeholder="Задача" required />
-          <input type="text" id="taskRole" placeholder="Роль / отдел" />
-          <textarea id="taskDescription" placeholder="Описание"></textarea>
-          <label>Срок
-            <input type="date" id="taskDueDate" />
-          </label>
-          <button type="submit">Добавить задачу</button>
-        </form>
-        <ul id="taskList" class="item-list"></ul>
-      </section>
-
-      <section id="files" class="tab-panel">
-        <form id="fileForm" class="card-form">
-          <input type="file" id="fileInput" required />
-          <button type="submit">Загрузить</button>
-        </form>
-        <ul id="fileList" class="item-list"></ul>
-      </section>
-    </section>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <div id="result"></div>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
