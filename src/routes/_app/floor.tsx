@@ -6,6 +6,7 @@ import { floorCast, floorDepts, floorTransport, overtimeOf, project, shiftLen, t
 import { FloorBoard, hereNames, missingNames } from "@/components/floor-board";
 import { useSmena, type Punch } from "@/lib/store";
 import { cn } from "@/lib/cn";
+import { downloadCsv } from "@/lib/csv";
 
 export const Route = createFileRoute("/_app/floor")({ component: Floor });
 
@@ -15,31 +16,16 @@ const tabs: { id: "transport" | "cast" | "dept"; label: string; rows: FloorRow[]
   { id: "dept", label: "Группа", rows: floorDepts },
 ];
 
-function csvCell(v: string) {
-  return `"${v.replace(/"/g, '""')}"`;
-}
-
 function exportTimesheet(rows: FloorRow[], punch: Record<string, Punch>) {
   const header = ["Группа", "Имя", "Детали", "Вызов", "План стоп", "Приехал", "Стоп", "Уехал", "Смена", "Переработка"];
-  const lines = [header.map(csvCell).join(";")];
-  for (const r of rows) {
+  const lines = rows.map((r) => {
     const p = punch[r.id];
     const end = p?.stop ?? p?.left;
     const worked = end ? shiftLen(p?.arrived ?? r.call, end) : "";
     const ot = end ? (overtimeOf(end, r.wrap) ?? "") : "";
-    lines.push(
-      [r.kind, r.name, r.detail ?? "", r.call, r.wrap, p?.arrived ?? "", p?.stop ?? "", p?.left ?? "", worked, ot]
-        .map(csvCell)
-        .join(";"),
-    );
-  }
-  const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `tabel-smena-${project.day}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
+    return [r.kind, r.name, r.detail ?? "", r.call, r.wrap, p?.arrived ?? "", p?.stop ?? "", p?.left ?? "", worked, ot];
+  });
+  downloadCsv(`tabel-smena-${project.day}.csv`, header, lines);
   toast("Табель выгружен в CSV");
 }
 

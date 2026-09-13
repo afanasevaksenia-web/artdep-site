@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import type { ParsedScene } from "./script-parse";
 import {
   chatsSeed,
   eventsSeed,
@@ -32,7 +33,11 @@ type State = {
   menu: MenuPost[];
   lunch: string;
   punch: Record<string, Punch>;
+  customScript: ParsedScene[];
+  customScriptName: string | null;
   setMe: (id: string) => void;
+  setCustomScript: (scenes: ParsedScene[], name: string) => void;
+  clearCustomScript: () => void;
   setStatus: (id: string, s: CrewStatus) => void;
   send: (chatId: string, text: string, shot?: string) => void;
   readChat: (id: string) => void;
@@ -65,7 +70,11 @@ export const useSmena = create<State>()(
   menu: menuSeed,
   lunch: eventsSeed.find((e) => e.lunch)?.lunch === "отмена" ? "отмена" : (eventsSeed.find((e) => e.lunch)?.lunch ?? project.lunch),
   punch: {},
+  customScript: [],
+  customScriptName: null,
   setMe: (id) => set({ meId: id }),
+  setCustomScript: (scenes, name) => set({ customScript: scenes, customScriptName: name }),
+  clearCustomScript: () => set({ customScript: [], customScriptName: null }),
   setStatus: (id, s) => set({ statuses: { ...get().statuses, [id]: s } }),
   send: (chatId, text, shot) => {
     const me = people.find((p) => p.id === get().meId);
@@ -174,6 +183,8 @@ export const useSmena = create<State>()(
         menu: s.menu,
         lunch: s.lunch,
         punch: s.punch,
+        customScript: s.customScript,
+        customScriptName: s.customScriptName,
       }),
     },
   ),

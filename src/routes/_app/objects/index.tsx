@@ -1,9 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { isTodayObject, objectGroups, objects } from "@/lib/objects";
+import { toast } from "sonner";
+import { Download } from "lucide-react";
+import { isTodayObject, objectGroups, objects, type ShootObject } from "@/lib/objects";
 import { cn } from "@/lib/cn";
+import { downloadCsv } from "@/lib/csv";
 
 export const Route = createFileRoute("/_app/objects/")({ component: Objects });
+
+function exportObjects(list: ShootObject[]) {
+  downloadCsv(
+    "obiekty-obshina.csv",
+    ["Объект", "Подобъект", "Инт/Нат", "Группа", "Сцен", "Сцены", "Актёры", "Хронометраж"],
+    list.map((o) => [o.name, o.sub, o.intNat, o.group, o.scenesN, o.scenes, o.cast, o.dur]),
+  );
+  toast(`${list.length} объектов выгружено в CSV`);
+}
 
 function Objects() {
   const [q, setQ] = useState("");
@@ -46,7 +58,12 @@ function Objects() {
           </button>
         ))}
       </div>
-      <p className="mb-2 text-xs text-faint">{list.length} объектов</p>
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-xs text-faint">{list.length} объектов</p>
+        <button onClick={() => exportObjects(list)} className="flex items-center gap-1 text-xs font-semibold text-accent">
+          <Download className="size-3.5" /> .csv
+        </button>
+      </div>
       <ul className="rounded-lg border border-line bg-card">
         {list.map((o) => (
           <li key={o.id} className="border-b border-line last:border-0">
