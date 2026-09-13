@@ -1,0 +1,16 @@
+{
+  "name": "СМЕНА — штаб площадки",
+  "short_name": "СМЕНА",
+  "description": "Штаб площадки для съёмочной группы: вызывной, табель, чаты, доска дня",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e0d0b",
+  "theme_color": "#0e0d0b",
+  "lang": "ru",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

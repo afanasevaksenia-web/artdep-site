@@ -32,9 +32,14 @@ function Today() {
   return (
     <div className="flex flex-1 flex-col">
       <header className="px-5 pt-8 pb-3">
-        <p className="text-xs font-semibold tracking-[0.22em] text-accent uppercase">
-          {project.title} · смена {project.day}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-xs font-semibold tracking-[0.22em] text-accent uppercase">
+            {project.title} · смена {project.day}
+          </p>
+          <Link to="/callsheet" className="shrink-0 text-xs font-semibold text-accent">
+            вызывной →
+          </Link>
+        </div>
         <h1 className="mt-1 font-display text-3xl tracking-tight">{project.dateLabel}</h1>
         <p className="mt-1 text-sm text-muted">
           {me.role} · вызов {me.call} · план стоп {project.stopMotor}

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import {
   chatsSeed,
   eventsSeed,
@@ -51,7 +52,9 @@ const nextCol: Record<Task["col"], Task["col"]> = {
   блокер: "в работе",
 };
 
-export const useSmena = create<State>()((set, get) => ({
+export const useSmena = create<State>()(
+  persist(
+    (set, get) => ({
   meId: "ad2",
   statuses: Object.fromEntries(people.map((p) => [p.id, p.status])),
   chats: chatsSeed,
@@ -156,7 +159,25 @@ export const useSmena = create<State>()((set, get) => ({
       },
     });
   },
-}));
+    }),
+    {
+      name: "smena-store-v1",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (s) => ({
+        meId: s.meId,
+        statuses: s.statuses,
+        chats: s.chats,
+        messages: s.messages,
+        tasks: s.tasks,
+        notes: s.notes,
+        events: s.events,
+        menu: s.menu,
+        lunch: s.lunch,
+        punch: s.punch,
+      }),
+    },
+  ),
+);
 
 export function useMe() {
   const id = useSmena((s) => s.meId);

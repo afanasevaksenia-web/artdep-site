@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { floorCast, floorDepts, floorTransport, type FloorRow } from "@/lib/seed";
+import { toast } from "sonner";
+import { Download } from "lucide-react";
+import { floorCast, floorDepts, floorTransport, overtimeOf, project, shiftLen, type FloorRow } from "@/lib/seed";
 import { FloorBoard, hereNames, missingNames } from "@/components/floor-board";
-import { useSmena } from "@/lib/store";
+import { useSmena, type Punch } from "@/lib/store";
 import { cn } from "@/lib/cn";
 
 export const Route = createFileRoute("/_app/floor")({ component: Floor });
@@ -12,6 +14,34 @@ const tabs: { id: "transport" | "cast" | "dept"; label: string; rows: FloorRow[]
   { id: "cast", label: "Актёры", rows: floorCast },
   { id: "dept", label: "Группа", rows: floorDepts },
 ];
+
+function csvCell(v: string) {
+  return `"${v.replace(/"/g, '""')}"`;
+}
+
+function exportTimesheet(rows: FloorRow[], punch: Record<string, Punch>) {
+  const header = ["Группа", "Имя", "Детали", "Вызов", "План стоп", "Приехал", "Стоп", "Уехал", "Смена", "Переработка"];
+  const lines = [header.map(csvCell).join(";")];
+  for (const r of rows) {
+    const p = punch[r.id];
+    const end = p?.stop ?? p?.left;
+    const worked = end ? shiftLen(p?.arrived ?? r.call, end) : "";
+    const ot = end ? (overtimeOf(end, r.wrap) ?? "") : "";
+    lines.push(
+      [r.kind, r.name, r.detail ?? "", r.call, r.wrap, p?.arrived ?? "", p?.stop ?? "", p?.left ?? "", worked, ot]
+        .map(csvCell)
+        .join(";"),
+    );
+  }
+  const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `tabel-smena-${project.day}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Табель выгружен в CSV");
+}
 
 function Floor() {
   const punch = useSmena((s) => s.punch);
@@ -23,7 +53,15 @@ function Floor() {
 
   return (
     <div className="px-5 pt-8 pb-4">
-      <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">не спрашивать по рации</p>
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">не спрашивать по рации</p>
+        <button
+          onClick={() => exportTimesheet(all, punch)}
+          className="flex shrink-0 items-center gap-1 text-xs font-semibold text-accent"
+        >
+          <Download className="size-3.5" /> табель .csv
+        </button>
+      </div>
       <h1 className="font-display text-3xl">Кто на площадке</h1>
       <p className="mt-1 text-sm text-muted">Вызов · приехал · стоп · уехал. Переработка от планового стопа.</p>
 

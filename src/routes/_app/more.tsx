@@ -16,6 +16,10 @@ function More() {
         Сейчас ты: {me.name}, {me.role}
       </p>
       <nav className="rounded-lg border border-line bg-card">
+        <Link to="/callsheet" className="block border-b border-line px-4 py-4">
+          <div className="font-semibold">Вызывной</div>
+          <div className="text-sm text-muted">вся смена на одном листе · печать, поделиться</div>
+        </Link>
         <Link to="/floor" className="block border-b border-line px-4 py-4">
           <div className="font-semibold">Кто на площадке</div>
           <div className="text-sm text-muted">транспорт, актёры, группа · приехал / стоп / уехал</div>

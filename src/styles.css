@@ -68,3 +68,33 @@
     transition: none !important;
   }
 }
+
+/* Печать вызывного: тёмная киношная тема на бумаге не нужна — просто и разборчиво. */
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+  }
+  .bg-bg,
+  .bg-card,
+  .bg-surface,
+  .bg-accent-dim {
+    background: #ffffff !important;
+  }
+  .text-fg,
+  .text-muted,
+  .text-faint,
+  .text-accent,
+  .text-ok,
+  .text-warn,
+  .text-info {
+    color: #111111 !important;
+  }
+  .border-line,
+  .border-line\/60 {
+    border-color: #cccccc !important;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+}

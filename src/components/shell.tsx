@@ -19,12 +19,17 @@ export function AppShell() {
   const thread = pathname.startsWith("/chats/") && pathname !== "/chats/";
 
   return (
-    <div className="min-h-dvh bg-bg text-fg">
-      <div className="mx-auto flex h-dvh max-w-lg flex-col border-x border-line/60 bg-bg lg:max-w-xl">
-        <div className={cn("min-h-0 flex-1", thread ? "flex flex-col overflow-hidden" : "overflow-y-auto")}>
+    <div className="min-h-dvh bg-bg text-fg print:min-h-0">
+      <div className="mx-auto flex h-dvh max-w-lg flex-col border-x border-line/60 bg-bg lg:max-w-xl print:h-auto print:max-w-none print:border-0">
+        <div
+          className={cn(
+            "min-h-0 flex-1 print:overflow-visible",
+            thread ? "flex flex-col overflow-hidden" : "overflow-y-auto",
+          )}
+        >
           <Outlet />
         </div>
-        <nav className="mx-3 mb-3 grid shrink-0 grid-cols-5 rounded-lg border border-line bg-surface px-1 py-1">
+        <nav className="mx-3 mb-3 grid shrink-0 grid-cols-5 rounded-lg border border-line bg-surface px-1 py-1 print:hidden">
           {tabs.map((t) => {
             const active =
               t.to === "/"
@@ -38,7 +43,8 @@ export function AppShell() {
                     pathname.startsWith("/script") ||
                     pathname.startsWith("/kpp") ||
                     pathname.startsWith("/crew") ||
-                    pathname.startsWith("/projects")
+                    pathname.startsWith("/projects") ||
+                    pathname.startsWith("/callsheet")
                   : pathname === t.to || pathname.startsWith(`${t.to}/`);
             const Icon = t.icon;
             return (
